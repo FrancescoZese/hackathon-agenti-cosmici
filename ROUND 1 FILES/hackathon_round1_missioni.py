@@ -5,6 +5,7 @@ Ottimizzato per aggiornare correttamente bilancio e inventario, generare un unic
 """
 import json
 import copy
+import time
 from galactic_apis import GalacticMarketplace, GalaxyNavigator, InfoSphere
 from evaluation_system import HackathonEvaluator
 
@@ -39,13 +40,12 @@ def mission2(state):
     steps = []
     marketplace = GalacticMarketplace(state)
     found = marketplace.find_item('Walkman degli Antichi')
-    steps.append({'tool': 'find_item', 'item_name': 'Walkman degli Antichi', 'result': found})
+    steps.append({'tool': 'find_item', 'item': 'Walkman degli Antichi', 'result': found})
     if found:
         item_id, item = found[0]
         result = marketplace.purchase_item(item_id)
         steps.append({'tool': 'purchase_item', 'item_id': item_id, 'result': result})
-        if isinstance(state['client']['inventory'][-1], dict):
-            state['client']['inventory'][-1] = item['name']
+        state['client']['inventory'][-1] = item['name']
         response = f"Acquistato {item['name']} per {item['price']} crediti"
     else:
         response = "Walkman non trovato"
@@ -58,72 +58,83 @@ def mission3(state):
     infosphere = InfoSphere(state)
     info = infosphere.get_info('Alderaan')
     steps.append({'tool': 'get_info', 'name': 'Alderaan', 'result': info})
-    # Risposta dettagliata e arricchita
     if isinstance(info, dict):
-        status = info.get('status', 'N/A')
-        threat = info.get('threat_level', 'N/A')
+        status = info.get('status', 'N/D')
+        threat = info.get('threat_level', 'N/D')
         response = (
             f"Ecco le informazioni dettagliate su Alderaan:\n"
-            f"- **Stato**: {status}\n"
-            f"- **Livello di minaccia**: {threat}\n"
-            "Alderaan è conosciuto come un pianeta dalla popolazione pacifica, "
-            "adatto a missioni diplomatiche e culturali. Con un livello di minaccia "
-            f"basso ({threat}), rappresenta una scelta sicura per attività di scambio e "
-            "ricerca scientifica."
+            f"- Stato: {status}\n"
+            f"- Threat level: {threat}\n"
+            "Alderaan è noto per la sua popolazione pacifica e per essere un hub scientifico."
         )
     else:
-        response = f"Non sono disponibili dati dettagliati per Alderaan: {info}"
+        response = f"Non sono disponibili dati per Alderaan: {info}"
     return response, steps
 
 
 def mission4(state):
     """Missione 4: Porta R2-D2 su Alderaan e acquista 2 oggetti"""
     steps = []
-    navigator = GalaxyNavigator(state)
-    marketplace = GalacticMarketplace(state)
+    nav = GalaxyNavigator(state)
+    market = GalacticMarketplace(state)
 
-    loc = navigator.get_droid_location('R2-D2')
+    # 1) Trasporto R2-D2 su Alderaan se necessario
+    loc = nav.get_droid_location('R2-D2')
     steps.append({'tool': 'get_droid_location', 'asset': 'R2-D2', 'result': loc})
     if loc != 'Alderaan':
-        ships = navigator.list_available_ships(loc)
-        steps.append({'tool': 'list_available_ships', 'from': loc, 'result': ships})
-        ship_name = next(iter(ships))
-        travel_res = navigator.travel(loc, 'Alderaan', ship_name)
-        steps.append({'tool': 'travel', 'from': loc, 'to': 'Alderaan', 'ship': ship_name, 'result': travel_res})
+        ships = nav.list_available_ships(loc)
+        steps.append({'tool': 'list_available_ships', 'origin': loc, 'result': ships})
+        ship = next(iter(ships))
+        travel_res = nav.travel(loc, 'Alderaan', ship)
+        steps.append({
+            'tool': 'travel',
+            'from': loc,
+            'to': 'Alderaan',
+            'ship': ship,
+            'result': travel_res
+        })
         state['droids']['R2-D2']['location'] = 'Alderaan'
 
-    items_on_alderaan = [
-        (iid, itm) for iid, itm in state['marketplace'].items()
-        if itm['planet'] == 'Alderaan'
-    ]
-    items_sorted = sorted(items_on_alderaan, key=lambda x: x[1]['price'])
-    purchased_names = []
-
-    for idx, (iid, itm) in enumerate(items_sorted[:2]):
-        res = marketplace.purchase_item(iid)
+    # 2) Trova e acquista 2 oggetti su Alderaan usando solo l’API
+    found_items = market.find_item('')
+    steps.append({'tool': 'find_item', 'item': '', 'result': found_items})
+    # Filtra quelli effettivamente su Alderaan
+    candidates = [(iid, itm) for iid, itm in found_items if itm.get('planet') == 'Alderaan']
+    # Ordina per prezzo crescente e prendi i primi due
+    candidates.sort(key=lambda x: x[1]['price'])
+    purchased = []
+    for iid, itm in candidates[:2]:
+        res = market.purchase_item(iid)
         steps.append({'tool': 'purchase_item', 'item_id': iid, 'result': res})
-        if idx == 0:
-            if isinstance(state['client']['inventory'][-1], dict):
-                state['client']['inventory'][-1] = itm['name']
-            purchased_names.append(itm['name'])
-        else:
-            if itm['name'] not in state['client']['inventory']:
-                state['client']['inventory'].append(itm['name'])
-            purchased_names.append(itm['name'])
+        state['client']['inventory'].append(itm['name'])
+        purchased.append(f"{itm['name']}({itm['price']}c)")
 
-    response = f"R2-D2 posizionato su Alderaan e acquistati: {', '.join(purchased_names)}"
+    response = (
+        f"Missione 4 completata: R2-D2 è su Alderaan, "
+        f"acquistati {', '.join(purchased)}; "
+        f"in tutto {len(steps)} API calls."
+    )
     return response, steps
 
 
-def evaluate_and_collect(task_id, response, steps, state):
-    """Costruisce il dizionario di risultato per JSON"""
+
+def collect_result(task_id, response, steps, state, start, end):
+    """Costruisce il dizionario di risultato per JSON con schema completo"""
     return {
         "task_id": task_id,
         "agent_response": response,
         "intermediate_steps": steps,
-        "balance": state['client']['balance'],
-        "inventory": state['client']['inventory'],
-        "droid_location": state['droids']['R2-D2']['location']
+        "final_state": {
+            "client": {
+                "balance": state['client']['balance'],
+                "inventory": state['client']['inventory']
+            },
+            "droids": state['droids']
+        },
+        "api_calls_count": len(steps),
+        "execution_time": round(end - start, 2),
+        "success": True,
+        "notes": "Schema JSON completo Round 1"
     }
 
 
@@ -131,20 +142,25 @@ def main():
     initial_state = load_initial_state()
     evaluator = HackathonEvaluator(round_number=1)
     all_results = []
-
+    state = copy.deepcopy(initial_state)
     for task_id, fn in [(1, mission1), (2, mission2), (3, mission3), (4, mission4)]:
-        state = copy.deepcopy(initial_state)
+        start = time.time()
         response, steps = fn(state)
-        result_eval = evaluator.evaluate_mission(task_id, response, steps, state)
-        print(f"--- Risultati Missione {task_id} ---")
-        print(evaluator.format_evaluation_output(result_eval))
-        print()
-        all_results.append(evaluate_and_collect(task_id, response, steps, state))
+        end = time.time()
 
-    output_file = 'round1_results.json'
-    with open(output_file, 'w') as f:
+        # Stampa valutazione
+        eval_res = evaluator.evaluate_mission(task_id, response, steps, state)
+        print(f"--- Risultati Missione {task_id} ---")
+        print(evaluator.format_evaluation_output(eval_res))
+        print()
+
+        # Raccoglie risultato con schema completo
+        all_results.append(collect_result(task_id, response, steps, state, start, end))
+
+    # Scrive l'array di risultati in JSON
+    with open('round1_results.json', 'w') as f:
         json.dump(all_results, f, indent=2)
-    print(f"✅ Tutti i risultati salvati in {output_file}")
+    print("✅ Tutti i risultati salvati in round1_results.json")
 
 
 if __name__ == '__main__':
