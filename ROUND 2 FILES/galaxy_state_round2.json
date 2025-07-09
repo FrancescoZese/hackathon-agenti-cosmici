@@ -1,0 +1,121 @@
+{
+  "droids": {
+    "R2-D2": {
+      "location": "Tatooine",
+      "type": "astromech"
+    },
+    "C-3PO": {
+      "location": "Coruscant",
+      "type": "protocol"
+    }
+  },
+  "ships": {
+    "Millennium Falcon": {
+      "type": "cargo",
+      "location": "Coruscant",
+      "available": true,
+      "rental_cost": 600,
+      "speed": "fast"
+    },
+    "StarHopper": {
+      "type": "cargo", 
+      "location": "Tatooine",
+      "available": true,
+      "rental_cost": 400,
+      "speed": "medium"
+    },
+    "X-Wing": {
+      "type": "fighter",
+      "location": "Alderaan",
+      "available": true,
+      "rental_cost": 300,
+      "speed": "very_fast"
+    }
+  },
+  "travel_costs": {
+    "Tatooine-Coruscant": 120,
+    "Coruscant-Tatooine": 120,
+    "Tatooine-Alderaan": 180,
+    "Alderaan-Tatooine": 180,
+    "Coruscant-Alderaan": 100,
+    "Alderaan-Coruscant": 100
+  },
+  "marketplace": {
+    "LS001": {
+      "name": "Laser Sword",
+      "price": 500,
+      "planet": "Tatooine"
+    },
+    "LS002": {
+      "name": "Laser Sword", 
+      "price": 500,
+      "planet": "Coruscant"
+    },
+    "LS003": {
+      "name": "Laser Sword Elite",
+      "price": 750,
+      "planet": "Alderaan"
+    },
+    "BL001": {
+      "name": "Blaster",
+      "price": 300,
+      "planet": "Coruscant"
+    },
+    "BL002": {
+      "name": "Heavy Blaster",
+      "price": 450,
+      "planet": "Tatooine"
+    },
+    "WA001": {
+      "name": "Walkman degli Antichi",
+      "price": 250,
+      "planet": "Tatooine"
+    },
+    "HC001": {
+      "name": "Holocron",
+      "price": 800,
+      "planet": "Alderaan"
+    },
+    "HC002": {
+      "name": "Sith Holocron",
+      "price": 1200,
+      "planet": "Coruscant"
+    },
+    "SH001": {
+      "name": "Energy Shield",
+      "price": 400,
+      "planet": "Alderaan"
+    },
+    "CR001": {
+      "name": "Kyber Crystal",
+      "price": 600,
+      "planet": "Tatooine"
+    }
+  },
+  "client": {
+    "balance": 5000,
+    "inventory": []
+  },
+  "infosphere": {
+    "Cybersystems Inc.": {
+      "affiliation": "legitimate",
+      "planet": "Coruscant"
+    },
+    "Alderaan": {
+      "status": "peaceful",
+      "threat_level": "low"
+    },
+    "Trade Federation": {
+      "affiliation": "suspicious",
+      "planet": "Tatooine"
+    },
+    "Jedi Order": {
+      "affiliation": "heroic",
+      "planet": "Coruscant"
+    },
+    "Rebel Alliance": {
+      "affiliation": "heroic",
+      "planet": "Alderaan"
+    }
+  }
+} 

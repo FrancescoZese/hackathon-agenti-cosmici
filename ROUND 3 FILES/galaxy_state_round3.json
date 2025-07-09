@@ -1,0 +1,205 @@
+{
+  "droids": {
+    "R2-D2": {
+      "location": "Coruscant",
+      "type": "astromech"
+    },
+    "C-3PO": {
+      "location": "Coruscant",
+      "type": "protocol"
+    },
+    "BB-8": {
+      "location": "Alderaan",
+      "type": "astromech"
+    }
+  },
+  "ships": {
+    "Millennium Falcon": {
+      "type": "cargo",
+      "location": "Coruscant",
+      "available": true,
+      "rental_cost": 600,
+      "speed": "fast"
+    },
+    "StarHopper": {
+      "type": "cargo",
+      "location": "Tatooine",
+      "available": true,
+      "rental_cost": 400,
+      "speed": "medium"
+    },
+    "X-Wing": {
+      "type": "fighter",
+      "location": "Alderaan",
+      "available": true,
+      "rental_cost": 300,
+      "speed": "very_fast"
+    },
+    "Imperial Shuttle": {
+      "type": "luxury",
+      "location": "Coruscant",
+      "available": true,
+      "rental_cost": 800,
+      "speed": "fast"
+    },
+    "Podracer": {
+      "type": "racing",
+      "location": "Tatooine",
+      "available": true,
+      "rental_cost": 200,
+      "speed": "ultra_fast"
+    }
+  },
+  "travel_costs": {
+    "Tatooine-Coruscant": 120,
+    "Coruscant-Tatooine": 120,
+    "Tatooine-Alderaan": 180,
+    "Alderaan-Tatooine": 180,
+    "Coruscant-Alderaan": 100,
+    "Alderaan-Coruscant": 100
+  },
+  "marketplace": {
+    "LS001": {
+      "name": "Laser Sword",
+      "price": 500,
+      "planet": "Tatooine"
+    },
+    "LS002": {
+      "name": "Laser Sword",
+      "price": 500,
+      "planet": "Coruscant"
+    },
+    "LS003": {
+      "name": "Laser Sword Elite",
+      "price": 750,
+      "planet": "Alderaan"
+    },
+    "LS004": {
+      "name": "Master's Laser Sword",
+      "price": 1500,
+      "planet": "Coruscant"
+    },
+    "WA002": {
+      "name": "Ancient Datapad",
+      "price": 400,
+      "planet": "Coruscant"
+    },
+    "SH001": {
+      "name": "Energy Shield",
+      "price": 400,
+      "planet": "Alderaan"
+    },
+    "SH002": {
+      "name": "Combat Shield",
+      "price": 700,
+      "planet": "Tatooine"
+    },
+    "AR001": {
+      "name": "Battle Armor",
+      "price": 800,
+      "planet": "Alderaan"
+    },
+    "AR002": {
+      "name": "Stealth Suit",
+      "price": 1100,
+      "planet": "Coruscant"
+    },
+    "ST001": {
+      "name": "Starmap",
+      "price": 350,
+      "planet": "Tatooine"
+    },
+    "ST002": {
+      "name": "Hyperdrive Core",
+      "price": 1800,
+      "planet": "Coruscant"
+    },
+    "MF001": {
+      "name": "Food Rations",
+      "price": 50,
+      "planet": "Tatooine"
+    },
+    "MF002": {
+      "name": "Medical Kit",
+      "price": 200,
+      "planet": "Alderaan"
+    }
+  },
+  "client": {
+    "balance": 8000,
+    "inventory": [
+      "Walkman degli Antichi",
+      "Sith Holocron",
+      "Blaster",
+      "Repair Tools",
+      "Synthetic Crystal",
+      "Master Holocron",
+      "Holocron",
+      "Sniper Blaster",
+      "Heavy Blaster",
+      "Kyber Crystal"
+    ]
+  },
+  "infosphere": {
+    "Cybersystems Inc.": {
+      "affiliation": "legitimate",
+      "planet": "Coruscant"
+    },
+    "Alderaan": {
+      "status": "peaceful",
+      "threat_level": "low"
+    },
+    "Trade Federation": {
+      "affiliation": "suspicious",
+      "planet": "Tatooine"
+    },
+    "Jedi Order": {
+      "affiliation": "heroic",
+      "planet": "Coruscant"
+    },
+    "Rebel Alliance": {
+      "affiliation": "heroic",
+      "planet": "Alderaan"
+    },
+    "Empire": {
+      "affiliation": "hostile",
+      "planet": "Coruscant"
+    },
+    "Smugglers Guild": {
+      "affiliation": "neutral",
+      "planet": "Tatooine"
+    },
+    "Bounty Hunters": {
+      "affiliation": "mercenary",
+      "planet": "Alderaan"
+    },
+    "Galactic Senate": {
+      "affiliation": "legitimate",
+      "planet": "Coruscant"
+    },
+    "Moisture Farmers": {
+      "affiliation": "neutral",
+      "planet": "Tatooine"
+    },
+    "Royal House": {
+      "affiliation": "legitimate",
+      "planet": "Alderaan"
+    },
+    "Criminal Underworld": {
+      "affiliation": "hostile",
+      "planet": "Tatooine"
+    },
+    "Technology Consortium": {
+      "affiliation": "legitimate",
+      "planet": "Coruscant"
+    },
+    "Medical Alliance": {
+      "affiliation": "heroic",
+      "planet": "Alderaan"
+    },
+    "Droid Manufacturers": {
+      "affiliation": "legitimate",
+      "planet": "Coruscant"
+    }
+  }
+}

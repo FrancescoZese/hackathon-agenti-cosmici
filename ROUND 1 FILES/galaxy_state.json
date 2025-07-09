@@ -1,0 +1,68 @@
+{
+  "droids": {
+    "R2-D2": {
+      "location": "Coruscant",
+      "type": "astromech"
+    }
+  },
+  "ships": {
+    "Millennium Falcon": {
+      "type": "cargo",
+      "location": "Coruscant",
+      "available": true,
+      "rental_cost": 300,
+      "speed": "fast"
+    },
+    "StarHopper": {
+      "type": "cargo",
+      "location": "Tatooine",
+      "available": true,
+      "rental_cost": 200,
+      "speed": "medium"
+    }
+  },
+  "travel_costs": {
+    "Tatooine-Coruscant": 120,
+    "Coruscant-Tatooine": 120,
+    "Tatooine-Alderaan": 180,
+    "Alderaan-Tatooine": 180,
+    "Coruscant-Alderaan": 100,
+    "Alderaan-Coruscant": 100
+  },
+  "marketplace": {
+    "HC001": {
+      "name": "Holocron",
+      "price": 800,
+      "planet": "Alderaan"
+    },
+    "WA001": {
+      "name": "Walkman degli Antichi",
+      "price": 200,
+      "planet": "Coruscant"
+    },
+    "CR001": {
+      "name": "Crystal Shard",
+      "price": 100,
+      "planet": "Coruscant"
+    },
+    "MS001": {
+      "name": "Map Scanner", 
+      "price": 150,
+      "planet": "Alderaan"
+    }
+  },
+  "client": {
+    "balance": 700,
+    "inventory": []
+  },
+  "infosphere": {
+    "Cybersystems Inc.": {
+      "affiliation": "legitimate",
+      "planet": "Coruscant"
+    },
+    "Alderaan": {
+      "status": "peaceful",
+      "threat_level": "low"
+    }
+  }
+}

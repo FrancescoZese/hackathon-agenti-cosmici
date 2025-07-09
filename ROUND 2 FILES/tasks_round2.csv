@@ -1,0 +1,7 @@
+task_id,description,difficulty,max_score
+1,"Trova R2-D2 e portalo su Coruscant. Poi compra 2 Laser Sword diverse su pianeti diversi",medium,150
+2,"Usa l'InfoSfera per trovare informazioni su 'Alderaan'. Se il threat_level è 'low', trasporta R2-D2 lì",medium,120
+3,"Ottimizza i costi: trova la rotta più economica per visitare tutti e 3 i pianeti (Tatooine-Coruscant-Alderaan)",medium,100
+4,"Compra l'oggetto più costoso che puoi permetterti, poi usa i crediti rimanenti per comprare altri oggetti",medium,130
+5,"Missione multi-step: porta R2-D2 su Alderaan, compra un Holocron, e torna su Tatooine",hard,180
+6,"Challenge finale: massimizza il numero di oggetti acquistati rimanendo nel budget di 5000 crediti",hard,200 

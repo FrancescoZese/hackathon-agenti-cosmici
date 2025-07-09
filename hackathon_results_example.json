@@ -1,0 +1,59 @@
+{
+  "mission_1": {
+    "score": 85,
+    "max_score": 100,
+    "percentage": 85.0,
+    "breakdown": {
+      "correctness": {
+        "score": 60,
+        "max": 60,
+        "percentage": 100.0
+      },
+      "efficiency": {
+        "score": 15,
+        "max": 20,
+        "percentage": 75.0
+      },
+      "quality": {
+        "score": 10,
+        "max": 20,
+        "percentage": 50.0
+      }
+    },
+    "api_calls_used": 8,
+    "execution_time": 23.5
+  },
+  "mission_2": {
+    "score": 92,
+    "max_score": 100,
+    "percentage": 92.0,
+    "breakdown": {
+      "correctness": {
+        "score": 60,
+        "max": 60,
+        "percentage": 100.0
+      },
+      "efficiency": {
+        "score": 18,
+        "max": 20,
+        "percentage": 90.0
+      },
+      "quality": {
+        "score": 14,
+        "max": 20,
+        "percentage": 70.0
+      }
+    },
+    "api_calls_used": 6,
+    "execution_time": 18.2
+  },
+  "summary": {
+    "total_missions": 2,
+    "average_score": 88.5,
+    "total_score": 177,
+    "max_possible_score": 200,
+    "overall_percentage": 88.5,
+    "round_number": 2,
+    "evaluation_timestamp": "2025-01-06T15:30:00Z"
+  }
+} 
