@@ -1,0 +1,6 @@
+task_id,description,difficulty,max_score
+1,"SPEED RUN: Completa qualsiasi 3 missioni del Round 1 nel minor numero di API calls possibile",expert,200
+2,"INTELLIGENCE: Raccogli informazioni su TUTTE le entità nell'InfoSfera e crea un report completo",expert,150
+3,"LOGISTICS MASTER: Pianifica una rotta che tocchi tutti i pianeti spendendo il MINIMO possibile",expert,180
+4,"MULTI-OBJECTIVE: Porta R2-D2 su ogni pianeta almeno una volta E compra almeno 1 oggetto per pianeta",expert,280
+5,"ULTIMATE CHALLENGE: Inventa e completa una missione personale che dimostri padronanza completa del sistema",expert,400 
