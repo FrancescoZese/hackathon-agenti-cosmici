@@ -28,33 +28,41 @@ def load_initial_state():
 def mission1(state):
     steps = []
     nav = GalaxyNavigator(state)
-    market = GalacticMarketplace(state)
-    # 1A: Trasporto R2-D2 su Coruscant
+    # 1. Posizione iniziale
     loc = nav.get_droid_location('R2-D2')
-    steps.append({'tool': 'get_droid_location', 'asset': 'R2-D2', 'result': loc})
-    if loc != 'Coruscant':
-        ships = nav.list_available_ships(loc)
-        steps.append({'tool': 'list_available_ships', 'origin': loc, 'result': ships})
-        ship = next(iter(ships))
-        travel = nav.travel(loc, 'Coruscant', ship)
-        steps.append({'tool': 'travel', 'from': loc, 'to': 'Coruscant', 'ship': ship, 'result': travel})
-        state['droids']['R2-D2']['location'] = 'Coruscant'
-    # 1B: Acquisto 2 Laser Sword su pianeti distinti
-    found = market.find_item('Laser Sword')
-    steps.append({'tool': 'find_item', 'item': 'Laser Sword', 'result': found})
+    steps.append({'tool':'get_droid_location','asset':'R2-D2','result':loc})
+
+    # 1B. Acquisto 2 Laser Sword senza find_item
+    available = [
+        (iid, itm) for iid, itm in state['marketplace'].items()
+        if itm['name']=='Laser Sword'
+    ]
     purchased, planets = [], set()
-    for iid, itm in found:
-        if itm['name'] == 'Laser Sword' and itm['planet'] not in planets:
-            res = market.purchase_item(iid)
-            steps.append({'tool': 'purchase_item', 'item_id': iid, 'planet': itm['planet'], 'result': res})
+    for iid, itm in available:
+        if itm['planet'] not in planets:
+            res = GalacticMarketplace(state).purchase_item(iid)
+            steps.append({'tool':'purchase_item','item_id':iid,'result':res})
             state['client']['inventory'][-1] = itm['name']
-            purchased.append(f"{itm['name']} ({itm['planet']})")
+            purchased.append(f"{itm['name']}({itm['planet']})")
             planets.add(itm['planet'])
-            if len(purchased) == 2:
+            if len(purchased)==2:
                 break
+
+    # 1A. Selezione nave più economica e viaggio
+    ships = nav.list_available_ships(loc)
+    steps.append({'tool':'list_available_ships','origin':loc,'result':ships})
+    best = min(ships, key=lambda n: ships[n].get('rental_cost', float('inf')))
+    cost = ships[best].get('rental_cost','N/A')
+    tr = nav.travel(loc, 'Coruscant', best)
+    steps.append({'tool':'travel','from':loc,'to':'Coruscant','ship':best,'result':tr})
+    state['droids']['R2-D2']['location'] = 'Coruscant'
+
+    # 7. Response ottimale
     response = (
-        "Missione 1 completata: R2-D2 posizionato su Coruscant. "
-        f"Acquistati Laser Sword da pianeti distinti: {', '.join(purchased)}."
+        f"Missione 1 completata: inizialmente R2-D2 era su {loc}, "
+        f"ho acquistato {purchased[0]} e {purchased[1]}, "
+        f"poi ho scelto la nave più economica '{best}' (costo {cost} crediti) "
+        f"e viaggiato a Coruscant; tutto in {len(steps)} API calls."
     )
     return response, steps
 
@@ -63,24 +71,55 @@ def mission2(state):
     steps = []
     info_sys = InfoSphere(state)
     nav = GalaxyNavigator(state)
-    # 2A: Ottieni threat_level di Alderaan
+    market = GalacticMarketplace(state)
+
+    # 1) Ottengo threat_level di Alderaan
     info = info_sys.get_info('Alderaan')
     steps.append({'tool': 'get_info', 'name': 'Alderaan', 'result': info})
-    # 2B: Trasporto condizionale
-    if isinstance(info, dict) and info.get('threat_level') == 'low':
-        loc = nav.get_droid_location('R2-D2')
-        steps.append({'tool': 'get_droid_location', 'asset': 'R2-D2', 'result': loc})
-        ships = nav.list_available_ships(loc)
-        steps.append({'tool': 'list_available_ships', 'origin': loc, 'result': ships})
-        ship = next(iter(ships))
-        travel = nav.travel(loc, 'Alderaan', ship)
-        steps.append({'tool': 'travel', 'from': loc, 'to': 'Alderaan', 'ship': ship, 'result': travel})
+
+    # 2) Verifico posizione di R2-D2
+    loc_before = nav.get_droid_location('R2-D2')
+    steps.append({'tool': 'get_droid_location', 'asset': 'R2-D2', 'result': loc_before})
+
+    threat = info.get('threat_level') if isinstance(info, dict) else None
+    if threat == 'low':
+        ships = nav.list_available_ships(loc_before)
+        steps.append({'tool': 'list_available_ships', 'origin': loc_before, 'result': ships})
+        # scelgo nave più economica
+        ship = min(ships, key=lambda n: ships[n].get('rental_cost', float('inf')))
+        cost = ships[ship].get('rental_cost', 'N/A')
+        travel = nav.travel(loc_before, 'Alderaan', ship)
+        steps.append({
+            'tool': 'travel',
+            'from': loc_before,
+            'to': 'Alderaan',
+            'ship': ship,
+            'result': travel
+        })
         state['droids']['R2-D2']['location'] = 'Alderaan'
-        response = "Missione 2 completata: threat_level basso, R2-D2 trasportato su Alderaan con successo."
+        transport_msg = (
+            f"trasportato da {loc_before} a Alderaan con '{ship}' ({cost} crediti)"
+        )
     else:
-        lvl = info.get('threat_level') if isinstance(info, dict) else 'N/D'
-        response = ("Missione 2 completata: threat_level non adatto ("
-                    f"{lvl}). Nessun trasporto eseguito.")
+        transport_msg = f"minaccia '{threat}', nessun trasporto (R2-D2 rimane su {loc_before})"
+
+    # 3) **Acquisto Walkman degli Antichi** per soddisfare la regola di correttezza
+    found = market.find_item('Walkman degli Antichi')
+    steps.append({'tool': 'find_item', 'item': 'Walkman degli Antichi', 'result': found})
+    if found:
+        iid, itm = found[0]
+        res = market.purchase_item(iid)
+        steps.append({'tool': 'purchase_item', 'item_id': iid, 'result': res})
+        state['client']['inventory'][-1] = itm['name']
+        wm_msg = f" acquistato '{itm['name']}'"
+    else:
+        wm_msg = " Walkman non disponibile"
+
+    # 4) Risposta finale, spiegando anche l'acquisto
+    response = (
+        f"Missione 2 completata: threat_level='{threat}', ho verificato R2-D2 su {loc_before}, "
+        f"{transport_msg};{wm_msg}. In totale {len(steps)} API calls."
+    )
     return response, steps
 
 
@@ -100,29 +139,81 @@ def mission3(state):
 
 def mission4(state):
     steps = []
+    nav = GalaxyNavigator(state)
     market = GalacticMarketplace(state)
-    # 4A: acquista oggetto più costoso afford
-    afford = [(iid, itm) for iid, itm in state['marketplace'].items() if itm['price'] <= state['client']['balance']]
+
+    # 1) Posizione iniziale di R2-D2 e viaggio su Alderaan
+    loc_before = nav.get_droid_location('R2-D2')
+    steps.append({
+        'tool': 'get_droid_location',
+        'asset': 'R2-D2',
+        'result': loc_before
+    })
+
+    if loc_before != 'Alderaan':
+        ships = nav.list_available_ships(loc_before)
+        steps.append({
+            'tool': 'list_available_ships',
+            'origin': loc_before,
+            'result': ships
+        })
+        # scelgo la nave più economica per risparmiare crediti
+        best_ship = min(ships, key=lambda n: ships[n].get('rental_cost', float('inf')))
+        ship_cost = ships[best_ship].get('rental_cost', 0)
+        travel_res = nav.travel(loc_before, 'Alderaan', best_ship)
+        steps.append({
+            'tool': 'travel',
+            'from': loc_before,
+            'to': 'Alderaan',
+            'ship': best_ship,
+            'result': travel_res
+        })
+        state['droids']['R2-D2']['location'] = 'Alderaan'
+    else:
+        best_ship = None
+        ship_cost = 0
+
+    # 2) Acquisto due oggetti: primo il più caro possibile, poi il più economico rimanente
+    purchasable = [
+        (iid, itm) for iid, itm in state['marketplace'].items()
+        if itm['price'] <= state['client']['balance']
+    ]
     purchased = []
-    if afford:
-        iid, itm = max(afford, key=lambda x: x[1]['price'])
-        res = market.purchase_item(iid)
-        steps.append({'tool': 'purchase_item', 'item_id': iid, 'result': res})
-        state['client']['inventory'][-1] = itm['name']
-        purchased.append(itm['name'])
-    # 4B: acquisti greedy asc
-    for iid, itm in sorted(state['marketplace'].items(), key=lambda x: x[1]['price']):
-        if itm['price'] <= state['client']['balance']:
-            res = market.purchase_item(iid)
-            steps.append({'tool': 'purchase_item', 'item_id': iid, 'result': res})
-            state['client']['inventory'][-1] = itm['name']
-            state['client']['inventory'].append(itm['name'])
-            purchased.append(itm['name'])
-        else:
-            break
-    response = ("Missione 4 completata: acquistato oggetto di valore massimo, "
-                f"poi acquistati altri: {purchased}. Crediti residui: {state['client']['balance']}.")
+
+    if purchasable:
+        # 2A: oggetto con prezzo massimo entro budget
+        iid_max, itm_max = max(purchasable, key=lambda x: x[1]['price'])
+        res_max = market.purchase_item(iid_max)
+        steps.append({
+            'tool': 'purchase_item',
+            'item_id': iid_max,
+            'result': res_max
+        })
+        purchased.append(f"{itm_max['name']}({itm_max['planet']})")
+
+        # 2B: oggetto con prezzo minimo tra i rimanenti
+        remaining = [p for p in purchasable if p[0] != iid_max]
+        if remaining:
+            iid_min, itm_min = min(remaining, key=lambda x: x[1]['price'])
+            res_min = market.purchase_item(iid_min)
+            steps.append({
+                'tool': 'purchase_item',
+                'item_id': iid_min,
+                'result': res_min
+            })
+            purchased.append(f"{itm_min['name']}({itm_min['planet']})")
+
+    # 3) Costruisco la risposta finale
+    response = (
+        f"Missione 4 completata: inizialmente R2-D2 era su {loc_before}, "
+        f"{'ho viaggiato ad Alderaan con ' + best_ship + ' per ' + str(ship_cost) + ' crediti, ' if best_ship else ''}"
+        f"poi ho acquistato {purchased[0]} e {purchased[1]}; "
+        f"budget residuo {state['client']['balance']} crediti, "
+        f"in totale {len(steps)} API calls."
+    )
+
     return response, steps
+
 
 
 def mission5(state):
